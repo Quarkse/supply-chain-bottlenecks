@@ -1,0 +1,329 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+
+@prefix ex: <https://www.example.org/supply-chain-ontology#> .
+
+@prefix amd: <https://www.amd.any/supplychain#> .
+@prefix tsmc: <https://www.tsmc.any/supplychain#> .
+@prefix sumco: <https://www.sumco.any/supplychain#> .
+@prefix shinetsu: <https://www.shinetsu.any/supplychain#> .
+@prefix siltronic: <https://www.siltronic.any/supplychain#> .
+@prefix gw: <https://www.globalwafers.any/supplychain#> .
+@prefix wacker: <https://www.wackerchemie.any/supplychain#> .
+@prefix samsung: <https://www.samsung.any/supplychain#> .
+@prefix aws: <https://www.aws.any/supplychain#> .
+@prefix microsoft: <https://www.microsoft.any/supplychain#> .
+@prefix dell: <https://www.dell.any/supplychain#> .
+@prefix lenovo: <https://www.lenovo.any/supplychain#> .
+@prefix hp: <https://www.hp.any/supplychain#> .
+@prefix sapphire: <https://www.sapphire.any/supplychain#> .
+@prefix asrock: <https://www.asrock.any/supplychain#> .
+
+
+# T-box
+
+ex:Organization a rdfs:Class ;
+    owl:disjointWith ex:ProductOrServiceGroup , ex:ProductOrService .
+
+ex:ProductOrServiceGroup a rdfs:Class ;
+    owl:disjointWith ex:Organization , ex:ProductOrService .
+
+ex:ProductOrService a rdfs:Class ;
+    owl:disjointWith ex:Organization , ex:ProductOrServiceGroup .
+
+ex:hasProductOrService a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:domain [ a rdfs:Class ; owl:unionOf ( ex:Organization ex:ProductOrServiceGroup ) ] ;
+    rdfs:range [ a rdfs:Class ; owl:unionOf ( ex:ProductOrServiceGroup ex:ProductOrService ) ] .
+
+ex:productOrServiceOf a owl:ObjectProperty ;
+    rdfs:domain ex:ProductOrService ;
+    rdfs:range ex:Organization .
+
+ex:madeWithProductOrService a owl:ObjectProperty ;
+    rdfs:domain ex:ProductOrService ;
+    rdfs:range ex:ProductOrService .
+
+ex:hasCustomer a owl:ObjectProperty ;
+    rdfs:domain ex:ProductOrService ;
+    rdfs:range ex:Organization .
+
+
+# A-box
+
+# AMD
+
+amd:this a ex:Organization ;
+    rdfs:label "Advanced Micro Devices" ;
+    ex:hasProductOrService amd:CPU , amd:GPU .
+
+amd:CPU a ex:ProductOrServiceGroup ;
+    rdfs:label "CPUs" ;
+    ex:hasProductOrService amd:CPU:Server , amd:CPU:Desktop .
+
+amd:CPU:Server a ex:ProductOrServiceGroup ;
+    rdfs:label "Server CPUs" ;
+    ex:hasProductOrService amd:EPYC9301 .
+
+amd:EPYC9301 a ex:ProductOrService ;
+    rdfs:label "EPYC 9301" ;
+    ex:productOrServiceOf amd:this ;
+    ex:madeWithProductOrService tsmc:3nm ;
+    ex:hasCustomer aws:this , microsoft:this .
+
+amd:CPU:Desktop a ex:ProductOrServiceGroup ;
+    rdfs:label "Desktop CPUs" ;
+    ex:hasProductOrService amd:Ryzen59600 , amd:Ryzen59600X .
+
+amd:Ryzen59600 a ex:ProductOrService ;
+    rdfs:label "Ryzen 5 9600" ;
+    ex:productOrServiceOf amd:this ;
+    ex:madeWithProductOrService tsmc:3nm , samsung:3nm ;
+    ex:hasCustomer dell:this , lenovo:this .
+
+amd:Ryzen59600X a ex:ProductOrService ;
+    rdfs:label "Ryzen 5 9600X" ;
+    ex:productOrServiceOf amd:this ;
+    ex:madeWithProductOrService tsmc:3nm , samsung:3nm ;
+    ex:hasCustomer dell:this , lenovo:this , hp:this .
+
+amd:GPU a ex:ProductOrServiceGroup ;
+    rdfs:label "GPUs" ;
+    ex:hasProductOrService amd:GPU:Desktop .
+
+amd:GPU:Desktop a ex:ProductOrServiceGroup ;
+    rdfs:label "Desktop GPUs" ;
+    ex:hasProductOrService amd:Navi32 , amd:GPU:Desktop:GraphicCards .
+
+amd:Navi32 a ex:ProductOrService ;
+    rdfs:label "Navi 32" ;
+    ex:productOrServiceOf amd:this ;
+    ex:madeWithProductOrService tsmc:3nm ;
+    ex:hasCustomer sapphire:this , asrock:this .
+
+amd:GPU:Desktop:GraphicCards a ex:ProductOrServiceGroup ;
+    rdfs:label "Desktop graphic cards" ;
+    ex:hasProductOrService amd:RadeonRX8700XT .
+
+amd:RadeonRX8700XT a ex:ProductOrService ;
+    rdfs:label "Radeon RX 8700 XT" ;
+    ex:productOrServiceOf amd:this ;
+    ex:madeWithProductOrService amd:Navi32 ;
+    ex:hasCustomer dell:this , lenovo:this .
+
+
+# TSMC
+
+tsmc:this a ex:Organization ;
+    rdfs:label "Taiwan Semiconductor Manufacturing Company" ;
+    ex:hasProductOrService tsmc:foundry .
+
+tsmc:foundry a ex:ProductOrServiceGroup ;
+    rdfs:label "Foundry services" ;
+    ex:hasProductOrService tsmc:3nm .
+
+tsmc:3nm a ex:ProductOrService ;
+    rdfs:label "3 nm technology foundry service" ;
+    ex:productOrServiceOf tsmc:this ;
+    ex:madeWithProductOrService sumco:300mm , shinetsu:300mm , siltronic:300mm , gw:300mm ;
+    ex:hasCustomer amd:this .
+
+
+# Samsung
+
+samsung:this a ex:Organization ;
+    rdfs:label "Samsung" ;
+    ex:hasProductOrService samsung:services .
+
+samsung:services a ex:ProductOrServiceGroup ;
+    rdfs:label "Services" ;
+    ex:hasProductOrService samsung:services:foundry .
+
+samsung:services:foundry a ex:ProductOrServiceGroup ;
+    rdfs:label "Foundry services" ;
+    ex:hasProductOrService samsung:3nm .
+
+samsung:3nm a ex:ProductOrService ;
+    rdfs:label "3 nm technology foundry service" ;
+    ex:productOrServiceOf samsung:this ;
+    ex:madeWithProductOrService sumco:300mm , shinetsu:300mm , gw:300mm ;
+    ex:hasCustomer amd:this .
+
+
+# SUMCO
+
+sumco:this a ex:Organization ;
+    rdfs:label "SUMCO" ;
+    ex:hasProductOrService sumco:wafer .
+
+sumco:wafer a ex:ProductOrServiceGroup ;
+    rdfs:label "Wafers" ;
+    ex:hasProductOrService sumco:300mm .
+
+sumco:300mm a ex:ProductOrService ;
+    rdfs:label "300 mm wafer" ;
+    ex:productOrServiceOf sumco:this ;
+    ex:madeWithProductOrService wacker:polysilicon ;
+    ex:hasCustomer tsmc:this , samsung:this .
+
+
+# Shin Etsu
+
+shinetsu:this a ex:Organization ;
+    rdfs:label "Shin Etsu" ;
+    ex:hasProductOrService shinetsu:wafer .
+
+shinetsu:wafer a ex:ProductOrServiceGroup ;
+    rdfs:label "Wafers" ;
+    ex:hasProductOrService shinetsu:300mm .
+
+shinetsu:300mm a ex:ProductOrService ;
+    rdfs:label "300 mm wafer" ;
+    ex:productOrServiceOf shinetsu:this ;
+    ex:madeWithProductOrService wacker:polysilicon ;
+    ex:hasCustomer tsmc:this , samsung:this .
+
+
+# Siltronic
+
+siltronic:this a ex:Organization ;
+    rdfs:label "Siltronic" ;
+    ex:hasProductOrService siltronic:wafer .
+
+siltronic:wafer a ex:ProductOrServiceGroup ;
+    rdfs:label "Wafers" ;
+    ex:hasProductOrService siltronic:300mm .
+
+siltronic:300mm a ex:ProductOrService ;
+    rdfs:label "300 mm wafer" ;
+    ex:productOrServiceOf siltronic:this ;
+    ex:madeWithProductOrService wacker:polysilicon ;
+    ex:hasCustomer tsmc:this .
+
+
+# GlobalWafers
+
+gw:this a ex:Organization ;
+    rdfs:label "GlobalWafers" ;
+    ex:hasProductOrService gw:wafer .
+
+gw:wafer a ex:ProductOrServiceGroup ;
+    rdfs:label "Wafers" ;
+    ex:hasProductOrService gw:300mm .
+
+gw:300mm a ex:ProductOrService ;
+    rdfs:label "300 mm wafer" ;
+    ex:productOrServiceOf gw:this ;
+    ex:madeWithProductOrService wacker:polysilicon ;
+    ex:hasCustomer tsmc:this , samsung:this .
+
+
+# Wacker Chemie
+
+wacker:this a ex:Organization ;
+    rdfs:label "Wacker Chemie" ;
+    ex:hasProductOrService wacker:wafer .
+
+wacker:silicon a ex:ProductOrServiceGroup ;
+    rdfs:label "Silicon" ;
+    ex:hasProductOrService wacker:polysilicon .
+
+wacker:polysilicon  a ex:ProductOrService ;
+    rdfs:label "Polysilicon" ;
+    ex:productOrServiceOf wacker:this ;
+    ex:hasCustomer sumco:this , shinetsu:this , siltronic:this , gw:this .
+
+
+# AWS
+
+aws:this a ex:Organization ;
+    rdfs:label "Amazon Web Services" .
+
+
+# Microsoft
+
+microsoft:this a ex:Organization ;
+    rdfs:label "Microsoft" .
+
+
+# Dell
+
+dell:this a ex:Organization ;
+    rdfs:label "Dell" .
+
+
+# Lenovo
+
+lenovo:this a ex:Organization ;
+    rdfs:label "Lenovo" .
+
+
+# HP
+
+hp:this a ex:Organization ;
+    rdfs:label "HP" .
+
+
+# Sapphire
+
+sapphire:this a ex:Organization ;
+    rdfs:label "Sapphire Technology" ;
+    ex:hasProductOrService sapphire:NITRO , sapphire:PULSE .
+
+sapphire:NITRO a ex:ProductOrServiceGroup ;
+    rdfs:label "NITRO" ;
+    ex:hasProductOrService sapphire:NITRO:RX8700 , sapphire:NITRO:RX8700XT .
+
+sapphire:NITRO:RX8700 a ex:ProductOrService ;
+    rdfs:label "NITRO Radeon RX 8700" ;
+    ex:productOrServiceOf sapphire:this ;
+    ex:madeWithProductOrService amd:Navi32 ;
+    ex:hasCustomer dell:this , lenovo:this .
+    
+sapphire:NITRO:RX8700XT a ex:ProductOrService ;
+    rdfs:label "NITRO Radeon RX 8700 XT" ;
+    ex:productOrServiceOf sapphire:this ;
+    ex:madeWithProductOrService amd:Navi32 ;
+    ex:hasCustomer dell:this .
+
+sapphire:PULSE a ex:ProductOrServiceGroup ;
+    rdfs:label "PULSE" ;
+    ex:hasProductOrService sapphire:PULSE:RX8700XT .
+
+sapphire:PULSE:RX8700XT a ex:ProductOrService ;
+    rdfs:label "PULSE Radeon RX 8700 XT" ;
+    ex:productOrServiceOf sapphire:this ;
+    ex:madeWithProductOrService amd:Navi32 ;
+    ex:hasCustomer dell:this , lenovo:this , hp:this .
+
+
+# AS Rock
+
+asrock:this a ex:Organization ;
+    rdfs:label "AS Rock" ;
+    ex:hasProductOrService asrock:Graphiccards .
+
+asrock:Graphiccards a ex:ProductOrServiceGroup ;
+    rdfs:label "Graphic cards" ;
+    ex:hasProductOrService asrock:Challenger , asrock:Phantom .
+
+asrock:Challenger a ex:ProductOrServiceGroup ;
+    rdfs:label "Challenger" ;
+    ex:hasProductOrService asrock:Challenger:RX8700XT .
+
+asrock:Challenger:RX8700XT a ex:ProductOrService ;
+    rdfs:label "Challenger Radeon RX 8700" ;
+    ex:productOrServiceOf asrock:this ;
+    ex:madeWithProductOrService amd:Navi32 ;
+    ex:hasCustomer dell:this .
+
+asrock:Phantom a ex:ProductOrServiceGroup ;
+    rdfs:label "Phantom" ;
+    ex:hasProductOrService asrock:Phantom:RX8700XT .
+
+asrock:Phantom:RX8700XT a ex:ProductOrService ;
+    rdfs:label "Phantom Radeon RX 8700 XT" ;
+    ex:productOrServiceOf asrock:this ;
+    ex:madeWithProductOrService amd:Navi32 ;
+    ex:hasCustomer lenovo:this, hp:this .
